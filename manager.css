@@ -45,6 +45,37 @@ body {
 .row.blue {
     background: #2980b9;
 }
+.row.deleted {
+    text-decoration: line-through;
+    color: #ccc;
+}
+
+.cell.phrase-text {
+    width: 500px;
+}
+
+#actions {
+    float:right;
+}
+
+.icon {
+    opacity: 0.2;
+}
+
+.icon.enabled {
+    transition: .3s ease;
+    opacity: 0.75;
+}
+.icon.enabled:hover{
+    opacity: 1.0;
+}
+
+
+input.editable {
+    width: 100%;
+    font-size: 14px;
+}
+
 @media screen and (max-width: 580px) {
     .row {
         padding: 8px 0;

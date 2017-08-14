@@ -18,25 +18,72 @@ function draw_table(data) {
             var phrase_item_phrase = $('<div class="cell phrase-text" />');
             var phrase_item_duration = $('<div class="cell duration" />');
             var trash = $('<div class="cell trash"></div>');
-            trash.append($('<img src="images/icons/garbage.png" width="24" height="24"/>'));
-            trash.click(function() { trash_phrase(phrase_item) });
+            trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
             $(phrase_item_phrase).html(phrase.text);
             $(phrase_item_duration).html(generate_duration_opt(phrase.duration));
             phrase_item.append(phrase_item_phrase);
             phrase_item.append(phrase_item_duration);
             phrase_item.append(trash);
-            phraseList.append(phrase_item)
+            phraseList.append(phrase_item);
+
+            // Set action listeners
+            trash.click(function() { trash_phrase(phrase_item); });
+            phrase_item_phrase.click(function() { edit_phrase(phrase_item); });
         });
     }
 }
 
+function edit_phrase(row) {
+    var phrase_item_phrase = row.children('.phrase-text');
+    // var action_icon = row.children().find('img');
+    var editable = $('<input class="editable" type="text"/>');
+    var phrase_text = phrase_item_phrase.text();
+    var original_phrase = phrase_text;
+    phrase_item_phrase.unbind('click');
+    phrase_item_phrase.empty();
+    editable.val(phrase_text);
+    editable.blur(function() { save_phrase(row); });
+    editable.keypress( function(event) {
+        if ( event.which == 13 ) { save_phrase(row, original_phrase); }
+    });
+    phrase_item_phrase.append(editable);
+    editable.focus();
+}
+
+function save_phrase(row, original_phrase) {
+    var phrase_item_phrase = row.children('.phrase-text');
+    var editable = phrase_item_phrase.children('input');
+    var phrase_text = $.trim(editable.val());
+    if (phrase_text.length == 0) {
+        phrase_text = original_phrase;
+    }
+    editable.remove();
+    phrase_item_phrase.text(phrase_text);
+    phrase_item_phrase.click(function() { edit_phrase(row); });
+}
+
 function trash_phrase(row) {
-    console.log("removing row");
-    row.remove();
+    var phrase_item_phrase = row.children('.phrase-text');
+    var select = row.find('.select-duration');
+    var action_icon = row.children().find('img');
+    if (row.hasClass('deleted')) {
+        row.removeClass('deleted');
+        select.prop('disabled', false);
+        action_icon.attr('src', 'images/icons/trash.png');
+        action_icon.attr('alt', 'Delete phrase');
+        phrase_item_phrase.click(function() { edit_phrase(row); });
+    } else {
+        row.addClass('deleted');
+        select.prop('disabled', true);
+        action_icon.attr('src', 'images/icons/undo.png');
+        action_icon.attr('alt', 'Undo');
+        phrase_item_phrase.unbind('click');
+        set_changes_pending();
+    }
 }
 
 function generate_duration_opt(selected_duration) {
-    var select = $('<select class="duration" />');
+    var select = $('<select class="select-duration" />');
     for(var duration=2; duration < 11; duration++) {
         var opt = $("<option />");
         opt.val(duration);
@@ -44,5 +91,10 @@ function generate_duration_opt(selected_duration) {
         select.append(opt);
     }
     select.val(selected_duration.toString());
+    select.change(function() { set_changes_pending(); });
     return select;
+}
+
+function set_changes_pending() {
+    $('.icon').addClass('enabled');
 }
