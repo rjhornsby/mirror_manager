@@ -29,12 +29,14 @@ class MirrorManager < Sinatra::Base
     payload = JSON.parse(request.body.read) unless params[:path]
     json_data['phrases'] = payload['phrases']
     json_text = json_data.to_json
+    # TODO: validate the input...
     File.write('phrases.json', json_text)
     'OK'.to_json
   end
 
   options '*' do
     response.headers['Allow'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, Accept, X-User-Email, X-Auth-Token'
     response.headers['Access-Control-Allow-Origin'] = '*'
     200

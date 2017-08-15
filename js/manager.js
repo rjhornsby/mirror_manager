@@ -1,17 +1,51 @@
 
 var phrase_api = "http://localhost:9292/phrases";
-
+var cached_data = [];
 $(document).ready(function() {
-    $.getJSON( phrase_api, {})
+
+    $.getJSON(phrase_api, {})
         .done(function(data) {
             draw_table(data);
+            cached_data = data;
         });
+    $('#save_changes').click(function() { save_changes(); });
+    $('#cancel_changes').click(function() { reset_ui(); });
+
 });
+
+function reset_ui() {
+    draw_table(cached_data);
+    /* TODO: enable this
+    $('#save_changes').prop("disabled", true);
+    $('#cancel_changes').prop("disabled", true);
+
+    $('#save_changes').removeClass('enabled');
+    $('#cancel_changes').removeClass('enabled');
+    */
+}
+
+function save_changes() {
+
+    var data={phrases: []};
+
+    $('.phrase-item').each(function() {
+        var row = $(this);
+        var phrase_text = row.children('.phrase-text').text();
+        var duration = row.find('.select-duration').find(':selected').val();
+        data.phrases.push({'text': phrase_text, 'duration': duration});
+    });
+    console.log(JSON.stringify(data));
+    var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json');
+    posting.done(function(result) {
+            console.log(result);
+        });
+}
 
 function draw_table(data) {
     var phraseList = $('#phrase-list');
     $(".phrase-item").remove();
     var phrases = data.phrases;
+
     if (phrases.length) {
         $.each(phrases, function(index, phrase) {
             var phrase_item = $('<div class="row phrase-item"/>');
@@ -60,6 +94,11 @@ function save_phrase(row, original_phrase) {
     editable.remove();
     phrase_item_phrase.text(phrase_text);
     phrase_item_phrase.click(function() { edit_phrase(row); });
+
+    if (phrase_text != original_phrase) {
+        set_changes_pending();
+    }
+
 }
 
 function trash_phrase(row) {
@@ -69,12 +108,14 @@ function trash_phrase(row) {
     if (row.hasClass('deleted')) {
         row.removeClass('deleted');
         select.prop('disabled', false);
+        select.show();
         action_icon.attr('src', 'images/icons/trash.png');
         action_icon.attr('alt', 'Delete phrase');
         phrase_item_phrase.click(function() { edit_phrase(row); });
     } else {
         row.addClass('deleted');
         select.prop('disabled', true);
+        select.hide();
         action_icon.attr('src', 'images/icons/undo.png');
         action_icon.attr('alt', 'Undo');
         phrase_item_phrase.unbind('click');
@@ -97,4 +138,23 @@ function generate_duration_opt(selected_duration) {
 
 function set_changes_pending() {
     $('.icon').addClass('enabled');
+    $('#save_changes').prop("disabled", false);
+    $('#cancel_changes').prop("disabled", false);
+}
+
+$.put = function(url, data, callback, type){
+
+    if ( $.isFunction(data) ){
+        type = type || callback,
+            callback = data,
+            data = {}
+    }
+
+    return $.ajax({
+        url: url,
+        type: 'PUT',
+        success: callback,
+        data: data,
+        contentType: type
+    });
 }
