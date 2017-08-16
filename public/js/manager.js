@@ -1,27 +1,37 @@
 
-var phrase_api = "http://localhost:9292/phrases";
+var phrase_api = "http://" + $(location).attr('host') + "/phrases";
 var cached_data = [];
 $(document).ready(function() {
 
-    $.getJSON(phrase_api, {})
-        .done(function(data) {
+    var fetch = $.getJSON(phrase_api, {});
+
+    fetch.done(function(data) {
             draw_table(data);
             cached_data = data;
         });
+    fetch.fail(function(response){
+        api_fail('Retrieving phrases', response)
+    });
     $('#save_changes').click(function() { save_changes(); });
     $('#cancel_changes').click(function() { reset_ui(); });
 
 });
 
+function api_fail(action, response) {
+    var error_text = response.status + ' ' + response.statusText;
+    if (response.responseJSON) {
+        error_text += '\n\n' + response.responseJSON.message;
+    }
+    alert(action + ' failed: ' + error_text);
+}
+
 function reset_ui() {
     draw_table(cached_data);
-    /* TODO: enable this
     $('#save_changes').prop("disabled", true);
     $('#cancel_changes').prop("disabled", true);
 
     $('#save_changes').removeClass('enabled');
     $('#cancel_changes').removeClass('enabled');
-    */
 }
 
 function save_changes() {
@@ -37,8 +47,11 @@ function save_changes() {
     console.log(JSON.stringify(data));
     var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json');
     posting.done(function(result) {
-            console.log(result);
-        });
+        console.log(result);
+    });
+    posting.fail(function(response) {
+        api_fail('Saving', response);
+    });
 }
 
 function draw_table(data) {

@@ -4,14 +4,14 @@ require 'sinatra/cross_origin'
 require 'sinatra/json'
 require 'pp'
 
-class MirrorManager < Sinatra::Base
-  set :bind, '0.0.0.0'
-  set :port, 4567
-  configure do
-    enable :cross_origin
-  end
+class MirrorManager < Sinatra::Application
+
   before do
     response.headers['Access-Control-Allow-Origin'] = '*'
+  end
+
+  get '/' do
+    send_file File.join(settings.public_folder, 'manager.html')
   end
 
   get '/phrases' do
