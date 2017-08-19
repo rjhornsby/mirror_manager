@@ -1,5 +1,5 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), 'manager_service.rb')
+require File.join(File.dirname(__FILE__), 'manager.rb')
 
 require 'sinatra'
 require 'multi_json'
@@ -43,5 +43,9 @@ class ExceptionHandling
 end
 
 use ExceptionHandling
+
+use Rack::Auth::Basic, 'Authentication required' do |username, password|
+  username == 'admin' and password == 'mirror'
+end
 
 run MirrorManager

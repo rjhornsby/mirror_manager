@@ -34,6 +34,10 @@ class MirrorManager < Sinatra::Application
     'OK'.to_json
   end
 
+  error 401 do
+    'Error 401 - Authentication required'
+  end
+
   options '*' do
     response.headers['Allow'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
