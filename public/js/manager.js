@@ -42,12 +42,19 @@ function save_changes() {
         var row = $(this);
         var phrase_text = row.children('.phrase-text').text();
         var duration = row.find('.select-duration').find(':selected').val();
+        if ( row.hasClass('deleted') || row.hasClass('new')) {
+            // Effectively, continue
+            return true;
+        }
         data.phrases.push({'text': phrase_text, 'duration': duration});
+
     });
-    console.log(JSON.stringify(data));
+    // TODO: Validate data before trying to post?
     var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json');
     posting.done(function(result) {
-        console.log(result);
+        // TODO: Tell user save is complete
+        cached_data = data;
+        reset_ui();
     });
     posting.fail(function(response) {
         api_fail('Saving', response);
@@ -55,41 +62,53 @@ function save_changes() {
 }
 
 function draw_table(data) {
-    var phraseList = $('#phrase-list');
     $(".phrase-item").remove();
     var phrases = data.phrases;
 
+    // Provide for a new phrase to be added by the user
+    add_phrase_to_table({text: "[add new phrase]", duration: 2, is_new: true})
+
     if (phrases.length) {
         $.each(phrases, function(index, phrase) {
-            var phrase_item = $('<div class="row phrase-item"/>');
-            var phrase_item_phrase = $('<div class="cell phrase-text" />');
-            var phrase_item_duration = $('<div class="cell duration" />');
-            var trash = $('<div class="cell trash"></div>');
-            trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
-            $(phrase_item_phrase).html(phrase.text);
-            $(phrase_item_duration).html(generate_duration_opt(phrase.duration));
-            phrase_item.append(phrase_item_phrase);
-            phrase_item.append(phrase_item_duration);
-            phrase_item.append(trash);
-            phraseList.append(phrase_item);
-
-            // Set action listeners
-            trash.click(function() { trash_phrase(phrase_item); });
-            phrase_item_phrase.click(function() { edit_phrase(phrase_item); });
+            add_phrase_to_table(phrase);
         });
     }
 }
 
+function add_phrase_to_table(phrase) {
+    var phraseList = $('#phrase-list');
+    var phrase_item = $('<div class="row phrase-item"/>');
+    var phrase_item_phrase = $('<div class="cell phrase-text" />');
+    var phrase_item_duration = $('<div class="cell duration" />');
+    var trash = $('<div class="cell trash"></div>');
+    trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
+    $(phrase_item_phrase).html(phrase.text);
+    $(phrase_item_duration).html(generate_duration_opt(phrase.duration));
+    phrase_item.append(phrase_item_phrase);
+    phrase_item.append(phrase_item_duration);
+    phrase_item.append(trash);
+    phraseList.append(phrase_item);
+
+    if ("is_new" in phrase) {
+        phrase_item.addClass('new');
+    }
+
+    // Set action listeners
+    trash.click(function() { trash_phrase(phrase_item); });
+    phrase_item_phrase.click(function() { edit_phrase(phrase_item); });
+}
+
 function edit_phrase(row) {
     var phrase_item_phrase = row.children('.phrase-text');
-    // var action_icon = row.children().find('img');
     var editable = $('<input class="editable" type="text"/>');
     var phrase_text = phrase_item_phrase.text();
     var original_phrase = phrase_text;
     phrase_item_phrase.unbind('click');
     phrase_item_phrase.empty();
-    editable.val(phrase_text);
-    editable.blur(function() { save_phrase(row); });
+    if ( ! row.hasClass('new')) {
+        editable.val(phrase_text);
+    }
+    editable.blur(function() { save_phrase(row, original_phrase); });
     editable.keypress( function(event) {
         if ( event.which == 13 ) { save_phrase(row, original_phrase); }
     });
@@ -109,6 +128,7 @@ function save_phrase(row, original_phrase) {
     phrase_item_phrase.click(function() { edit_phrase(row); });
 
     if (phrase_text != original_phrase) {
+        row.removeClass('new');
         set_changes_pending();
     }
 

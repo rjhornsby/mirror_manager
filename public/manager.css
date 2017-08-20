@@ -45,6 +45,11 @@ body {
 .row.blue {
     background: #2980b9;
 }
+
+.row.new {
+    color: #aaa;
+}
+
 .row.deleted {
     text-decoration: line-through;
     color: #ccc;
