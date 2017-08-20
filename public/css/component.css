@@ -55,7 +55,6 @@ perspective effects (not including the modals and the overlay).
 	left: 0;
 	z-index: 1000;
 	opacity: 0;
-	# 2b2b2b
 	background: rgba(41,128,185,0.8);
 	-webkit-transition: all 0.3s;
 	-moz-transition: all 0.3s;
