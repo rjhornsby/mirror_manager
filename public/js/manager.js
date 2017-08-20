@@ -27,11 +27,11 @@ function api_fail(action, response) {
 
 function reset_ui() {
     draw_table(cached_data);
-    $('#save_changes').prop("disabled", true);
-    $('#cancel_changes').prop("disabled", true);
-
-    $('#save_changes').removeClass('enabled');
-    $('#cancel_changes').removeClass('enabled');
+    // $('#save_changes').prop("disabled", true);
+    // $('#cancel_changes').prop("disabled", true);
+    //
+    // $('#save_changes').removeClass('enabled');
+    // $('#cancel_changes').removeClass('enabled');
 }
 
 function save_changes() {
@@ -52,9 +52,9 @@ function save_changes() {
     // TODO: Validate data before trying to post?
     var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json');
     posting.done(function(result) {
-        // TODO: Tell user save is complete
         cached_data = data;
         reset_ui();
+        $("body").toggleClass("dialogisOpen");
     });
     posting.fail(function(response) {
         api_fail('Saving', response);
@@ -170,9 +170,9 @@ function generate_duration_opt(selected_duration) {
 }
 
 function set_changes_pending() {
-    $('.icon').addClass('enabled');
-    $('#save_changes').prop("disabled", false);
-    $('#cancel_changes').prop("disabled", false);
+    // $('.icon').addClass('enabled');
+    // $('#save_changes').prop("disabled", false);
+    // $('#cancel_changes').prop("disabled", false);
 }
 
 $.put = function(url, data, callback, type){

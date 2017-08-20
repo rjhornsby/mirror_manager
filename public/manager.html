@@ -4,20 +4,40 @@
     <!-- Icons from https://www.flaticon.com/authors/anatoly -->
     <script src="js/jquery-3.2.1.js"></script>
     <script src="js/manager.js"></script>
-    <link rel = "stylesheet" type = "text/css" href = "manager.css" />
+    <script src="js/modal/modernizr.custom.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/modal.css" />
+    <link rel="stylesheet" type="text/css" href="css/component.css" />
+    <link rel = "stylesheet" type = "text/css" href = "css/manager.css" />
     <meta charset="UTF-8">
     <title>Mirror Manager</title>
 </head>
 <body>
 <h1>Mirror Manager</h1>
-<div class="wrapper">
+<div class="md-modal md-effect-16" id="modal-1">
+    <div class="md-content">
+        <h3>Changes Saved</h3>
+        <div>
+            <button class="md-close">Close</button>
+        </div>
+    </div>
+</div>
+<div class="md-modal md-effect-16" id="modal-2">
+    <div class="md-content">
+        <h3>Changes Canceled</h3>
+        <div>
+            <button class="md-close">Close</button>
+        </div>
+    </div>
+</div>
+<div class="wrapper" id="page-wrap">
     <div id="actions">
 
         <div class="cell">
-            <input id="save_changes" class="icon" type="image" src="images/icons/checked.png" height="24" width="24" />
+            <button id="save_changes" class="md-trigger" data-modal="modal-1">Save</button>
+            <!--<input id="save_changes" class="icon" type="image" src="images/icons/checked.png" height="24" width="24" />-->
         </div>
         <div class="cell">
-            <input id="cancel_changes" class="icon" type="image" src="images/icons/cancel.png" height="24" width="24" />
+            <button id="cancel_changes" class="md-trigger" data-modal="modal-2">Revert</button>
         </div>
     </div>
     <div id="phrase-list" class="table">
@@ -28,5 +48,20 @@
         </div>
     </div>
 </div>
+
+<div class="md-overlay"></div><!-- the overlay element -->
+
+<!-- classie.js by @desandro: https://github.com/desandro/classie -->
+<script src="js/modal/classie.js"></script>
+<script src="js/modal/modalEffects.js"></script>
+
+<!-- for the blur effect -->
+<!-- by @derSchepp https://github.com/Schepp/CSS-Filters-Polyfill -->
+<script>
+    // this is important for IEs
+    var polyfilter_scriptpath = '/js/';
+</script>
+<script src="js/modal/cssParser.js"></script>
+<script src="js/modal/css-filters-polyfill.js"></script>
 </body>
 </html>
