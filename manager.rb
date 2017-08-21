@@ -7,6 +7,7 @@ require 'pp'
 MAX_PHRASE_LENGTH = 128
 MAX_PHRASE_DURATION = 16
 MIN_PHRASE_DURATION = 2
+PHRASES_FILE = 'phrases.json'
 
 class MirrorManager < Sinatra::Application
 
@@ -19,7 +20,7 @@ class MirrorManager < Sinatra::Application
   end
 
   get '/phrases' do
-    data = JSON.parse(File.read('phrases.json'))
+    data = JSON.parse(File.read(PHRASES_FILE))
 
     data['phrases'].sort_by! { |phrase| phrase['text'].downcase }
     json data
@@ -34,9 +35,12 @@ class MirrorManager < Sinatra::Application
     json_data['phrases'] = filter_phrase_data(payload['phrases'])
 
     json_text = json_data.to_json
-    File.write('phrases.json', json_text)
+    File.write(PHRASES_FILE, json_text)
     'OK'.to_json
   end
+
+  # TODO: Manage song library
+  # TODO: Ensure the uploaded mp3 file format is correct, otherwise reject
 
   error 400..410 do
     'Error 401 - Authentication required'

@@ -50,15 +50,15 @@ function save_changes() {
 
     });
     // TODO: Validate data before trying to post?
-    var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json');
-    posting.done(function(result) {
-        cached_data = data;
-        reset_ui();
-        $("body").toggleClass("dialogisOpen");
-    });
-    posting.fail(function(response) {
-        api_fail('Saving', response);
-    });
+    var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json')
+        .done(function(result) {
+            cached_data = data;
+            reset_ui();
+            $("body").toggleClass("dialogisOpen");
+        })
+        .fail(function(response) {
+            api_fail('Saving', response);
+        });
 }
 
 function draw_table(data) {
@@ -86,15 +86,19 @@ function add_phrase_to_table(phrase) {
     $(phrase_item_duration).html(generate_duration_opt(phrase.duration));
     phrase_item.append(phrase_item_phrase);
     phrase_item.append(phrase_item_duration);
-    phrase_item.append(trash);
+
     phraseList.append(phrase_item);
 
     if ("is_new" in phrase) {
         phrase_item.addClass('new');
+        phrase_item.append('<div class="cell"/>');
+    } else {
+        // Trash is only for existing items
+        phrase_item.append(trash);
+        trash.click(function() { trash_phrase(phrase_item); });
     }
 
     // Set action listeners
-    trash.click(function() { trash_phrase(phrase_item); });
     phrase_item_phrase.click(function() { edit_phrase(phrase_item); });
 }
 
