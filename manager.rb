@@ -1,3 +1,4 @@
+require 'mp3info'
 require 'json'
 require 'sinatra'
 require 'sinatra/cross_origin'
@@ -8,6 +9,7 @@ MAX_PHRASE_LENGTH = 128
 MAX_PHRASE_DURATION = 16
 MIN_PHRASE_DURATION = 2
 PHRASES_FILE = 'phrases.json'
+MUSIC_PATH = 'audio'
 
 class MirrorManager < Sinatra::Application
 
@@ -28,19 +30,36 @@ class MirrorManager < Sinatra::Application
 
   post '/phrases' do
     now = Time.new
-    json_data = { 'last_modified': now.to_s }
+    phrase_data = { 'last_modified': now.to_s }
 
     payload = params
     payload = JSON.parse(request.body.read) unless params[:path]
-    json_data['phrases'] = filter_phrase_data(payload['phrases'])
+    phrase_data['phrases'] = filter_phrase_data(payload['phrases'])
 
-    json_text = json_data.to_json
+    json_text = JSON.pretty_generate(phrase_data)
     File.write(PHRASES_FILE, json_text)
     'OK'.to_json
   end
 
   # TODO: Manage song library
   # TODO: Ensure the uploaded mp3 file format is correct, otherwise reject
+
+  get '/music' do
+    track_list=[]
+    Dir.foreach(MUSIC_PATH) do |file|
+      file = [MUSIC_PATH, file].join('/')
+      if File.file?(file)
+        track_list << { file: File.basename(file), metadata: track_info(file) }
+      end
+    end
+    JSON.pretty_generate(track_list)
+  end
+
+  post '/music' do
+
+  end
+
+  # TODO: Manage mirror configuration (ie disable audio entirely)
 
   error 400..410 do
     'Error 401 - Authentication required'
@@ -69,6 +88,13 @@ class MirrorManager < Sinatra::Application
 
     filtered_data
 
+  end
+
+  def track_info(file)
+    Mp3Info.open(file) do |mp3info|
+      pp mp3info
+      return mp3info
+    end
   end
 
 end
