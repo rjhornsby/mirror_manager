@@ -11,21 +11,7 @@ $(document).ready(function() {
     fetch.fail(function(response){
         api_fail('Retrieving phrases', response)
     });
-    $('#save_changes').click(function() { save_changes(); });
-    $('#cancel_changes').click(function() { reset_ui(); });
-
 });
-
-
-
-function reset_ui() {
-    populate_phrases_table(cached_data);
-    // $('#save_changes').prop("disabled", true);
-    // $('#cancel_changes').prop("disabled", true);
-    //
-    // $('#save_changes').removeClass('enabled');
-    // $('#cancel_changes').removeClass('enabled');
-}
 
 function save_changes() {
 
@@ -46,8 +32,6 @@ function save_changes() {
     var posting = $.post(phrase_api, JSON.stringify(data), function(response) {}, 'json')
         .done(function(result) {
             cached_data.phrases = data.phrases;
-            reset_ui();
-            $("body").toggleClass("dialogisOpen");
         })
         .fail(function(response) {
             api_fail('Saving', response);
@@ -58,41 +42,46 @@ function populate_phrases_table(data) {
     $(".phrase-item").remove();
     var phrases = data.phrases;
 
-    // Provide for a new phrase to be added by the user
-    add_phrase_to_table({text: "[add new phrase]", duration: 2, is_new: true});
-
     if (phrases.length) {
         $.each(phrases, function(index, phrase) {
             add_phrase_to_table(phrase);
         });
     }
+    // Provide for a new phrase to be added by the user
+    add_phrase_to_table({text: "[add new phrase]", duration: 2, is_new: true});
+}
+
+function create_trashcan(row) {
+    var trash = row.children('.trash');
+    if ( trash.length == 0 ) {
+        var trash = $('<div class="cell trash"></div>');
+    }
+    trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
+    row.append(trash);
+    trash.click(function() { trash_phrase(row); });
 }
 
 function add_phrase_to_table(phrase) {
-    var phraseList = $('#phrase-list');
-    var phrase_item = $('<div class="row phrase-item"/>');
-    var phrase_item_phrase = $('<div class="cell phrase-text" />');
-    var phrase_item_duration = $('<div class="cell duration" />');
-    var trash = $('<div class="cell trash"></div>');
-    trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
-    $(phrase_item_phrase).html(phrase.text);
-    $(phrase_item_duration).html(generate_duration_opt(phrase.duration));
-    phrase_item.append(phrase_item_phrase);
-    phrase_item.append(phrase_item_duration);
+    var phrase_table = $('#phrase-list');
+    var row = $('<div class="row phrase-item"/>');
+    var cell_phrase = $('<div class="cell phrase-text" />');
+    var cell_duration = $('<div class="cell duration" />');
+    $(cell_phrase).html(phrase.text);
+    $(cell_duration).html(generate_duration_opt(phrase.duration));
+    row.append(cell_phrase);
+    row.append(cell_duration);
 
-    phraseList.append(phrase_item);
+    phrase_table.append(row);
 
     if ("is_new" in phrase) {
-        phrase_item.addClass('new');
-        phrase_item.append('<div class="cell"/>');
+        row.addClass('new');
+        row.append('<div class="cell trash"/>');
     } else {
-        // Trash is only for existing items
-        phrase_item.append(trash);
-        trash.click(function() { trash_phrase(phrase_item); });
+        create_trashcan(row);
     }
 
     // Set action listeners
-    phrase_item_phrase.click(function() { edit_phrase(phrase_item); });
+    cell_phrase.click(function() { edit_phrase(row); });
 }
 
 function edit_phrase(row) {
@@ -125,8 +114,13 @@ function save_phrase(row, original_phrase) {
     phrase_item_phrase.click(function() { edit_phrase(row); });
 
     if (phrase_text != original_phrase) {
-        row.removeClass('new');
-        set_changes_pending();
+        if (row.hasClass('new')) {
+            create_trashcan(row);
+            row.removeClass('new');
+            add_phrase_to_table({text: "[add new phrase]", duration: 2, is_new: true});
+        }
+        save_changes();
+
     }
 
 }
@@ -145,11 +139,10 @@ function trash_phrase(row) {
     } else {
         row.addClass('deleted');
         select.prop('disabled', true);
-        select.hide();
-        action_icon.attr('src', 'images/icons/undo.png');
-        action_icon.attr('alt', 'Undo');
-        phrase_item_phrase.unbind('click');
-        set_changes_pending();
+        row.fadeOut("slow", function() {
+            save_changes();
+            row.remove();
+        });
     }
 }
 
@@ -162,12 +155,7 @@ function generate_duration_opt(selected_duration) {
         select.append(opt);
     }
     select.val(selected_duration.toString());
-    select.change(function() { set_changes_pending(); });
+    select.change(function() { save_changes(); });
     return select;
 }
 
-function set_changes_pending() {
-    // $('.icon').addClass('enabled');
-    // $('#save_changes').prop("disabled", false);
-    // $('#cancel_changes').prop("disabled", false);
-}

@@ -60,6 +60,7 @@ class MirrorManager < Sinatra::Application
   end
 
   # TODO: Manage mirror configuration (ie disable audio entirely)
+  # TODO: Allow setting wifi params (name and password)
 
   error 400..410 do
     'Error 401 - Authentication required'
