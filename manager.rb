@@ -44,7 +44,7 @@ class MirrorManager < Sinatra::Application
   # TODO: Manage song library
   # TODO: Ensure the uploaded mp3 file format is correct, otherwise reject
 
-  get '/music' do
+  get '/tracks' do
     track_list=[]
     Dir.foreach(MUSIC_PATH) do |file|
       file = [MUSIC_PATH, file].join('/')
@@ -52,11 +52,16 @@ class MirrorManager < Sinatra::Application
         track_list << { file: File.basename(file), metadata: track_info(file) }
       end
     end
-    JSON.pretty_generate(track_list)
+    print JSON.pretty_generate(track_list)
+    json track_list
   end
 
-  post '/music' do
+  post '/tracks' do
 
+  end
+
+  delete '/tracks/:filename' do
+    
   end
 
   # TODO: Manage mirror configuration (ie disable audio entirely)
@@ -93,9 +98,16 @@ class MirrorManager < Sinatra::Application
 
   def track_info(file)
     Mp3Info.open(file) do |mp3info|
-      pp mp3info
       return mp3info
     end
   end
 
+end
+
+class Mp3Info
+  def to_json(*a)
+    hash = { json_class: self.class.name }
+    self.instance_variables.each {|var| hash[var.to_s.delete('@')] = self.instance_variable_get(var)}
+    hash.to_json(*a)
+  end
 end

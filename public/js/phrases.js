@@ -33,8 +33,8 @@ phraseController.model = {
 
         });
         // TODO: Validate data before trying to post?
-        var posting = $.post(phraseController.api_uri, JSON.stringify(data), function(response) {}, 'json')
-            .done(function(result) {
+        $.post(phraseController.api_uri, JSON.stringify(data), function(response) {}, 'json')
+            .done(function() {
                 cached_data.phrases = data.phrases;
             })
             .fail(function(response) {
