@@ -3,30 +3,48 @@
 <head>
     <!-- Icons from https://www.flaticon.com/authors/anatoly -->
     <script src="js/jquery-3.2.1.js"></script>
+    <script src="js/dropzone.js"></script>
     <script src="js/manager.js"></script>
     <script src="js/phrases.js"></script>
     <script src="js/tracks.js"></script>
+    <link rel = "stylesheet" type = "text/css" href = "css/dropzone.css" />
+    <link rel = "stylesheet" type = "text/css" href = "css/tabs.css" />
     <link rel = "stylesheet" type = "text/css" href = "css/manager.css" />
     <meta charset="UTF-8">
     <title>Mirror Manager</title>
 </head>
 <body>
-<h1>Mirror Manager</h1>
-<div class="wrapper" id="page-wrap">
-    <div id="phrase-list" class="table">
-        <div class="row header blue">
-            <div class="cell">Phrase</div>
-            <div class="cell">Duration</div>
-            <div class="cell"></div>
-        </div>
+<main>
+    <h1>Mirror Manager</h1>
+    <div class="wrapper" id="page-wrap">
+        <input id="tab1" type="radio" name="tabs" checked>
+        <label for="tab1">Phrases</label>
+
+        <input id="tab2" type="radio" name="tabs">
+        <label for="tab2">Music</label>
+
+        <section id="content1">
+            <div id="phrase-list" class="table">
+                <div class="row header blue">
+                    <div class="cell">Phrase</div>
+                    <div class="cell">Duration</div>
+                    <div class="cell"></div>
+                </div>
+            </div>
+        </section>
+        <section id="content2">
+            <div id="track-list" class="table">
+                <div class="row header blue">
+                    <div class="cell">Track</div>
+                    <div class="cell">Duration</div>
+                    <div class="cell"></div>
+                </div>
+            </div>
+            <form action="/tracks"
+                  class="dropzone"
+                  id="tracks-dropzone"></form>
+        </section>
     </div>
-    <div id="track-list" class="table">
-        <div class="row header blue">
-            <div class="cell">Track</div>
-            <div class="cell">Duration</div>
-            <div class="cell"></div>
-        </div>
-    </div>
-</div>
+</main>
 </body>
 </html>

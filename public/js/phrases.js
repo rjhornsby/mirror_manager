@@ -147,7 +147,7 @@ phraseController.dom = {
         if ( trash.length === 0 ) {
             trash = $('<div class="cell trash"></div>');
         }
-        trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
+        trash.append($('<img src="images/icons/trash.png" width="20" height="20"/>'));
         row.append(trash);
         trash.click(function() { phraseController.view.delete(row); });
     }
