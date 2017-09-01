@@ -9,7 +9,7 @@ MAX_PHRASE_LENGTH = 128
 MAX_PHRASE_DURATION = 16
 MIN_PHRASE_DURATION = 2
 PHRASES_FILE = 'phrases.json'
-MUSIC_PATH = 'audio'
+MUSIC_PATH = File.absolute_path('audio')
 
 class MirrorManager < Sinatra::Application
 
@@ -47,12 +47,11 @@ class MirrorManager < Sinatra::Application
   get '/tracks' do
     track_list=[]
     Dir.foreach(MUSIC_PATH) do |file|
-      file = [MUSIC_PATH, file].join('/')
+      file = [MUSIC_PATH, file].join(File::SEPARATOR)
       if File.file?(file)
         track_list << { file: File.basename(file), metadata: track_info(file) }
       end
     end
-    print JSON.pretty_generate(track_list)
     json track_list
   end
 
@@ -61,7 +60,9 @@ class MirrorManager < Sinatra::Application
   end
 
   delete '/tracks/:filename' do
-    
+    filename = [MUSIC_PATH, File.basename(params['filename'])].join(File::SEPARATOR)
+    File.delete(filename)
+    'OK'.to_json
   end
 
   # TODO: Manage mirror configuration (ie disable audio entirely)

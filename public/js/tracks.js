@@ -15,6 +15,17 @@ var trackController = {
     api_uri: "http://" + $(location).attr('host') + "/tracks"
 };
 
+trackController.model = {
+    delete: function(track) {
+        $.delete(trackController.api_uri + '/' + track, JSON.stringify(track), function(response) {}, 'json')
+            .done(function() {
+            })
+            .fail(function(response) {
+                api_fail('Deleting', response);
+            });
+    }
+};
+
 trackController.view = {
     populate_tracks_table: function(tracks) {
         if (tracks.length) {
@@ -28,15 +39,25 @@ trackController.view = {
         var row = $('<div class="row track-item"/>');
         var cell_title = $('<div class="cell track-title" />');
         var cell_duration = $('<div class="cell duration" />');
+
         $(cell_title).html(track.metadata.tag.title || track.file);
         $(cell_duration).html(trackController.view.format_duration(track.metadata.length));
         row.append(cell_title);
         row.append(cell_duration);
+        row.data('track-id', track.file);
 
         track_table.append(row);
 
-        // trackController.dom.create_trashcan(row);
+        trackController.dom.create_trashcan(row);
 
+    },
+    delete: function(row) {
+        row.addClass('deleted');
+        row.fadeOut("slow", function() {
+            var track = row.data('track-id');
+            row.remove();
+            trackController.model.delete(track);
+        });
     },
     format_duration: function(duration_as_seconds) {
         var minutes = parseInt(duration_as_seconds / 60);
@@ -45,3 +66,14 @@ trackController.view = {
     }
 };
 
+trackController.dom = {
+    create_trashcan: function(row) {
+        var trash = row.children('.trash');
+        if ( trash.length === 0 ) {
+            trash = $('<div class="cell trash"></div>');
+        }
+        trash.append($('<img src="images/icons/trash.png" width="24" height="24"/>'));
+        row.append(trash);
+        trash.click(function() { trackController.view.delete(row); });
+    }
+};
