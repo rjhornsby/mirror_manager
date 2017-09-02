@@ -4,7 +4,7 @@ require File.join(File.dirname(__FILE__), 'manager.rb')
 require 'sinatra'
 require 'multi_json'
 
-class MirrorManager <  Sinatra::Application
+class MirrorManager < Sinatra::Application
   configure do
 
     enable :cross_origin
@@ -34,10 +34,10 @@ class ExceptionHandling
       env['rack.errors'].puts ex.backtrace.join("\n")
       env['rack.errors'].flush
 
-      hash = { :message => ex.to_s }
+      hash = { message: ex.to_s }
       # hash[:backtrace] = ex.backtrace
 
-      [500, {'Content-Type' => 'application/json'}, [MultiJson.dump(hash)]]
+      [500, { 'Content-Type' => 'application/json' }, [MultiJson.dump(hash)]]
     end
   end
 end

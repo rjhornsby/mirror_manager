@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
-@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+@import url("opensans.css");
+@import url("font-awesome.min.css");
 *, *:before, *:after {
   margin: 0;
   padding: 0;
@@ -66,11 +66,11 @@ label[for*='1']:before {
 }
 
 label[for*='2']:before {
-  content: '\f17d';
+  content: '\f001';
 }
 
 label[for*='3']:before {
-  content: '\f16b';
+  content: '\f085';
 }
 
 label[for*='4']:before {

@@ -63,6 +63,9 @@ trackController.view = {
         var minutes = parseInt(duration_as_seconds / 60);
         var seconds = ('00' + parseInt(duration_as_seconds % 60)).slice(-2);
         return minutes + ":" + seconds;
+    },
+    upload_error: function(file, errorMessage) {
+        alert('Upload failed: ' + errorMessage);
     }
 };
 

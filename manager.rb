@@ -30,7 +30,7 @@ class MirrorManager < Sinatra::Application
 
   post '/phrases' do
     now = Time.new
-    phrase_data = { 'last_modified': now.to_s }
+    phrase_data = { last_modified: now.to_s }
 
     payload = params
     payload = JSON.parse(request.body.read) unless params[:path]
@@ -56,6 +56,10 @@ class MirrorManager < Sinatra::Application
   end
 
   post '/tracks' do
+    file = params['file']
+    check = track_valid?(file)
+    pp check.class
+    error check[:error], check[:message] if check.is_a?(Hash)
 
   end
 
@@ -68,7 +72,7 @@ class MirrorManager < Sinatra::Application
   # TODO: Manage mirror configuration (ie disable audio entirely)
   # TODO: Allow setting wifi params (name and password)
 
-  error 400..410 do
+  error 401 do
     'Error 401 - Authentication required'
   end
 
@@ -99,8 +103,20 @@ class MirrorManager < Sinatra::Application
 
   def track_info(file)
     Mp3Info.open(file) do |mp3info|
+      pp mp3info
       return mp3info
     end
+  end
+
+  def track_valid?(file)
+    return { error: 415, message: 'Invalid file type' } unless file['type'] == 'audio/mpeg'
+    return { error: 409, message: 'File exists' } if File.exist?([MUSIC_PATH, file['filename']].join(File::SEPARATOR))
+
+    # Grab the metadata only after we know we have an mp3 file
+    metadata = track_info(file[:tempfile])
+    return { error: 415, message: "Sample rate 44100 required. Got #{metadata.samplerate}" } unless metadata.samplerate == 44100
+
+    true
   end
 
 end

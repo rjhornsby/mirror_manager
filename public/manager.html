@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Icons from https://www.flaticon.com/authors/anatoly -->
     <script src="js/jquery-3.2.1.js"></script>
     <script src="js/dropzone.js"></script>
     <script src="js/manager.js"></script>
@@ -23,6 +22,9 @@
         <input id="tab2" type="radio" name="tabs">
         <label for="tab2">Music</label>
 
+        <input id="tab3" type="radio" name="tabs">
+        <label for="tab3">Configuration</label>
+
         <section id="content1">
             <div id="phrase-list" class="table">
                 <div class="row header blue">
@@ -42,7 +44,13 @@
             </div>
             <form action="/tracks"
                   class="dropzone"
-                  id="tracks-dropzone"></form>
+                  id="tracksDropzone"></form>
+        </section>
+        <section id="content3">
+            <div>Music (on/off)</div>
+            <div>WiFi Network</div>
+            <div>WiFi Password</div>
+            <div>Restart</div>
         </section>
     </div>
 </main>

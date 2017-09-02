@@ -1,5 +1,16 @@
 var cached_data = {phrases: [], tracks: []};
 
+Dropzone.options.tracksDropzone = {
+    maxFilesize: 30,
+    acceptedFiles: 'audio/mpeg',
+    init: function() {
+        this.on("error", function(file, errorMessage) {
+            trackController.view.upload_error(file, errorMessage);
+        });
+    }
+
+};
+
 function api_fail(action, response) {
     var error_text = response.status + ' ' + response.statusText;
     if (response.responseJSON) {
