@@ -45,27 +45,32 @@ class MirrorManager < Sinatra::Application
   # TODO: Ensure the uploaded mp3 file format is correct, otherwise reject
 
   get '/tracks' do
-    track_list=[]
+    track_list = []
     Dir.foreach(MUSIC_PATH) do |file|
-      file = [MUSIC_PATH, file].join(File::SEPARATOR)
-      if File.file?(file)
-        track_list << { file: File.basename(file), metadata: track_info(file) }
+      track = Track.new(file)
+      if track.file?
+        track_list << { file: track.basename, metadata: track.metadata }
       end
     end
     json track_list
   end
 
   post '/tracks' do
-    file = params['file']
-    check = track_valid?(file)
-    pp check.class
-    error check[:error], check[:message] if check.is_a?(Hash)
+    track = Track.new(params['file']['filename'], params['file'])
+    # pp file
+    error track.error, track.error_message unless track.upload_valid?
+
+    File.open(track.absolute_path, 'wb') do |f|
+      f.write(track.tempfile.read)
+    end
+
+    'OK'.to_json
 
   end
 
   delete '/tracks/:filename' do
-    filename = [MUSIC_PATH, File.basename(params['filename'])].join(File::SEPARATOR)
-    File.delete(filename)
+    track = Track.new(params[:filename])
+    File.delete(track.absolute_path)
     'OK'.to_json
   end
 
@@ -87,7 +92,7 @@ class MirrorManager < Sinatra::Application
   def filter_phrase_data(phrase_data)
     filtered_data = []
     phrase_data.each do |phrase|
-      next if phrase['text'].length == 0
+      next if phrase['text'].empty?
 
       duration = phrase['duration'].to_i
       duration = MIN_PHRASE_DURATION if duration < MIN_PHRASE_DURATION
@@ -98,25 +103,6 @@ class MirrorManager < Sinatra::Application
     end
 
     filtered_data
-
-  end
-
-  def track_info(file)
-    Mp3Info.open(file) do |mp3info|
-      pp mp3info
-      return mp3info
-    end
-  end
-
-  def track_valid?(file)
-    return { error: 415, message: 'Invalid file type' } unless file['type'] == 'audio/mpeg'
-    return { error: 409, message: 'File exists' } if File.exist?([MUSIC_PATH, file['filename']].join(File::SEPARATOR))
-
-    # Grab the metadata only after we know we have an mp3 file
-    metadata = track_info(file[:tempfile])
-    return { error: 415, message: "Sample rate 44100 required. Got #{metadata.samplerate}" } unless metadata.samplerate == 44100
-
-    true
   end
 
 end
@@ -124,7 +110,68 @@ end
 class Mp3Info
   def to_json(*a)
     hash = { json_class: self.class.name }
-    self.instance_variables.each {|var| hash[var.to_s.delete('@')] = self.instance_variable_get(var)}
+    instance_variables.each { |var| hash[var.to_s.delete('@')] = instance_variable_get(var) }
     hash.to_json(*a)
   end
+end
+
+class Track
+
+  @filename = nil
+  @upload = nil
+  @error = nil
+  @error_message = nil
+
+  attr_reader :tempfile
+  attr_reader :error
+  attr_reader :error_message
+
+  def initialize(filename, upload = nil)
+    @filename = File.basename(filename.gsub(/[^\w.]/, '_'))
+    @upload = upload
+  end
+
+  def upload_valid?
+    if @upload['type'] != 'audio/mpeg'
+      _set_error(415, 'Invalid file type')
+    elsif File.exist?(absolute_path)
+      _set_error(409, 'File exists')
+    elsif metadata.samplerate != 44_100
+      _set_error(415, "Sample rate 44100 required. Got #{metadata.samplerate}")
+    end
+
+    error.nil?
+  end
+
+  def metadata
+    Mp3Info.open(tempfile || absolute_path) do |mp3info|
+      return mp3info
+    end
+  end
+
+  def absolute_path
+    [MUSIC_PATH, @filename].join(File::SEPARATOR)
+  end
+
+  def basename
+    File.basename(absolute_path)
+  end
+
+  def file?
+    File.file?(absolute_path)
+  end
+
+  def tempfile
+    if @upload.nil?
+      nil
+    else
+      @upload['tempfile']
+    end
+  end
+
+  def _set_error(code, message)
+    @error = code
+    @error_message = message
+  end
+
 end

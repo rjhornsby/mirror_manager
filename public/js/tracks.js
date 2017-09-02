@@ -65,7 +65,13 @@ trackController.view = {
         return minutes + ":" + seconds;
     },
     upload_error: function(file, errorMessage) {
-        alert('Upload failed: ' + errorMessage);
+        if (file.xhr.status != 500) {
+            var message = errorMessage.message || errorMessage;
+            alert('Upload failed. Error [' + file.xhr.status + ']: ' + message);
+        } else {
+            alert('Upload failed: internal error');
+        }
+
     }
 };
 

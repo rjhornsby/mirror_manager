@@ -3,12 +3,13 @@ var cached_data = {phrases: [], tracks: []};
 Dropzone.options.tracksDropzone = {
     maxFilesize: 30,
     acceptedFiles: 'audio/mpeg',
+    addRemoveLinks: true,
     init: function() {
+        // TODO: DZ tooltip on 500 error is 'Object object'
         this.on("error", function(file, errorMessage) {
             trackController.view.upload_error(file, errorMessage);
         });
     }
-
 };
 
 function api_fail(action, response) {
