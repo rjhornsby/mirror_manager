@@ -71,7 +71,9 @@ trackController.view = {
         } else {
             alert('Upload failed: internal error');
         }
-
+    },
+    upload_success: function(file, response) {
+        trackController.view.add_track_to_table(response);
     }
 };
 

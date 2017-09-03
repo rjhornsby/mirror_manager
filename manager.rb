@@ -64,7 +64,8 @@ class MirrorManager < Sinatra::Application
       f.write(track.tempfile.read)
     end
 
-    'OK'.to_json
+    content_type :json
+    { file: track.basename, metadata: track.metadata }.to_json
 
   end
 

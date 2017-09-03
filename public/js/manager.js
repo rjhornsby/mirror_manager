@@ -9,6 +9,10 @@ Dropzone.options.tracksDropzone = {
         this.on("error", function(file, errorMessage) {
             trackController.view.upload_error(file, errorMessage);
         });
+        this.on("success", function(file, response) {
+            trackController.view.upload_success(file, response);
+            this.removeFile(file);
+        });
     }
 };
 
