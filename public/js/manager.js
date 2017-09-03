@@ -5,7 +5,7 @@ Dropzone.options.tracksDropzone = {
     acceptedFiles: 'audio/mpeg',
     addRemoveLinks: true,
     init: function() {
-        // TODO: DZ tooltip on 500 error is 'Object object'
+        // FIXME: DZ tooltip on 500 error is 'Object object'
         this.on("error", function(file, errorMessage) {
             trackController.view.upload_error(file, errorMessage);
         });
@@ -24,18 +24,21 @@ function api_fail(action, response) {
     alert(action + ' failed: ' + error_text);
 }
 
-$.delete = function(url, data, callback, type) {
-    if ( $.isFunction(data) ){
-        type = type || callback,
-            callback = data,
-            data = {}
-    }
+// PUT + DELETE methods
+jQuery.each( [ "put", "delete" ], function( i, method ) {
+    jQuery[ method ] = function( url, data, callback, type ) {
+        if ( jQuery.isFunction( data ) ) {
+            type = type || callback;
+            callback = data;
+            data = undefined;
+        }
 
-    return $.ajax({
-        url: url,
-        type: 'DELETE',
-        success: callback,
-        data: data,
-        contentType: type
-    });
-};
+        return jQuery.ajax({
+            url: url,
+            type: method,
+            dataType: type,
+            data: data,
+            success: callback
+        });
+    };
+});

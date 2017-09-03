@@ -125,7 +125,6 @@ phraseController.view = {
             }
             phraseController.model.commit();
         }
-
     }
 };
 

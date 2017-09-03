@@ -6,6 +6,7 @@
     <script src="js/manager.js"></script>
     <script src="js/phrases.js"></script>
     <script src="js/tracks.js"></script>
+    <script src="js/configuration.js"></script>
     <link rel = "stylesheet" type = "text/css" href = "css/dropzone.css" />
     <link rel = "stylesheet" type = "text/css" href = "css/tabs.css" />
     <link rel = "stylesheet" type = "text/css" href = "css/manager.css" />
@@ -47,10 +48,24 @@
                   id="tracksDropzone"></form>
         </section>
         <section id="content3">
-            <div>Music (on/off)</div>
-            <div>WiFi Network</div>
-            <div>WiFi Password</div>
-            <div>Restart</div>
+            <div id="configuration" class="table">
+                <div class="row">
+                    <div class="cell">Music</div>
+                    <div class="cell" id="config-music-toggle"><i class="fa fa-volume-off fa-lg" aria-hidden="true"></i></div>
+                </div>
+                <div class="row">
+                    <div class="cell">WiFi Network</div>
+                    <div class="cell" id="config-wifi-network"><input name="wifi-network" class="config"/></div>
+                </div>
+                <div class="row">
+                    <div class="cell">WiFi Password</div>
+                    <div class="cell" id="config-wifi-password"><input name="wifi-password" type="password" class="config"/></div>
+                </div>
+                <div class="row">
+                    <div class="cell">Restart</div>
+                    <div class="cell" id="config-restart"><i class="fa fa-refresh" aria-hidden="true"></i></div>
+                </div>
+            </div>
         </section>
     </div>
 </main>

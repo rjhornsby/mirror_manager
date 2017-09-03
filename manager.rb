@@ -17,10 +17,13 @@ class MirrorManager < Sinatra::Application
     response.headers['Access-Control-Allow-Origin'] = '*'
   end
 
+
+  ### Static content route ###
   get '/' do
     send_file File.join(settings.public_folder, 'manager.html')
   end
 
+  ### REST routes ###
   get '/phrases' do
     data = JSON.parse(File.read(PHRASES_FILE))
 
@@ -40,9 +43,6 @@ class MirrorManager < Sinatra::Application
     File.write(PHRASES_FILE, json_text)
     'OK'.to_json
   end
-
-  # TODO: Manage song library
-  # TODO: Ensure the uploaded mp3 file format is correct, otherwise reject
 
   get '/tracks' do
     track_list = []
@@ -74,6 +74,20 @@ class MirrorManager < Sinatra::Application
     File.delete(track.absolute_path)
     'OK'.to_json
   end
+
+  put('/config/music/:state') {
+    # TODO: set actual mirror config
+    'OK'.to_json
+  }
+  # https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
+  # wpa_cli reconfigure
+  # https://github.com/radiodan-archive/wpa-cli-ruby/blob/master/lib/wpa_cli_ruby/wpa_cli_wrapper.rb
+  put('/config/wifi/network/:name') {}
+  put('/config/wifi/password/:password') {}
+  put('/config/restart') {}
+
+
+  ### END ROUTES ###
 
   # TODO: Manage mirror configuration (ie disable audio entirely)
   # TODO: Allow setting wifi params (name and password)
@@ -123,7 +137,6 @@ class Track
   @error = nil
   @error_message = nil
 
-  attr_reader :tempfile
   attr_reader :error
   attr_reader :error_message
 
