@@ -60,7 +60,6 @@ class MirrorManager < Sinatra::Application
   end
 
   post '/tracks' do
-    pp params
     track = Track.new(params[:file][:filename], params[:file])
     error track.error, track.error_message unless track.upload_valid?
 
@@ -104,8 +103,13 @@ class MirrorManager < Sinatra::Application
     # ie the password is too short, etc
     # revert the changes to the file by using
     # wpa_cli save_config (?)
-    Wifi.new().reconfigure(payload['ssid'], payload['password'])
-    'OK'.to_json
+    result = Wifi.new().reconfigure(payload['ssid'], payload['password'])
+    unless result
+      error 400, 'password too short?'
+    else
+      'OK'.to_json
+    end
+
   end
 
 
@@ -182,7 +186,9 @@ class Wifi
     File.write('/etc/wpa_supplicant/wpa_supplicant.conf', renderer.result(binding))
     # puts output = renderer.result(binding)
     stdout, stderr, exit_status = Open3.capture3(@@wpa_cli, 'reconfigure')
-    return exit_status == 0
+    result = stdout.split("\n")[1]
+    return result == 'OK'
+
   end
 end
 

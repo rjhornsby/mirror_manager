@@ -54,7 +54,7 @@ var configurationController = {
                 }, 3000)
             })
             .fail(function(response) {
-                api_fail('Saving', response);
+                api_fail('setting wifi config', response);
             });
 
     }
