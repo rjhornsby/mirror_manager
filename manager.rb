@@ -212,8 +212,6 @@ class Track
       _set_error(415, 'Invalid file type')
     elsif File.exist?(absolute_path)
       _set_error(409, 'File exists')
-    elsif metadata.samplerate != 44_100
-      _set_error(415, "Sample rate 44100 required. Got #{metadata.samplerate}")
     end
 
     error.nil?
