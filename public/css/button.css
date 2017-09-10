@@ -44,6 +44,10 @@ a:hover, a:focus, a:active {
   text-decoration: none;
 }
 
+a.hidden {
+  display:none;
+}
+
 /* fancy Button */
 .fancy-button {
   display: inline-block;

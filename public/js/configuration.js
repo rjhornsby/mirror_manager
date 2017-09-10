@@ -46,6 +46,12 @@ var configurationController = {
         };
         $.post('/config/wifi/network', JSON.stringify(data), function(response) {}, 'json')
             .done(function() {
+                $('#save-wifi-config').hide();
+                $('#wifi-config-saved').css('display', 'inline-block');
+                setTimeout(function() {
+                    $('#save-wifi-config').show();
+                    $('#wifi-config-saved').css('display', 'none');
+                }, 3000)
             })
             .fail(function(response) {
                 api_fail('Saving', response);

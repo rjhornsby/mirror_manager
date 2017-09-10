@@ -92,12 +92,18 @@ class MirrorManager < Sinatra::Application
     status = Wifi.status
     status.to_json
   end
+
   post'/config/wifi/network' do
     payload = params
     payload = JSON.parse(request.body.read) unless params[:path]
+    pp payload
     if payload['ssid'].empty? || payload['password'].empty?
       error 400, 'SSID and password required'
     end
+    # TODO: handle the FAIL case from the reconfigure command
+    # ie the password is too short, etc
+    # revert the changes to the file by using
+    # wpa_cli save_config (?)
     Wifi.new().reconfigure(payload['ssid'], payload['password'])
     'OK'.to_json
   end
@@ -152,6 +158,11 @@ class Wifi
   attr_reader :ssid
   attr_reader :psk
 
+  def initialize
+    @ssid = nil
+    @psk = nil
+  end
+
   def self.status
     status = Hash.new()
     stdout, stderr, exit_status = Open3.capture3(@@wpa_cli, 'status')
@@ -168,14 +179,10 @@ class Wifi
     @psk = psk
     template = File.read('templates/wpa_supplicant.conf.erb')
     renderer = ERB.new(template, nil, '-')
-    puts renderer.result(binding)
-    # stdout, stderr, exit_status = Open3.capture3(@@wpa_cli, 'reconfigure')
-
-
-    # Wifi.wpa_cli('set_network', '0', 'ssid', "\"#{ssid}\"")
-    # Wifi.wpa_cli('set_network', '0', 'psk', "\"#{password}\"")
-    # Wifi.wpa_cli('enable_network', '0')
-    #
+    File.write('/etc/wpa_supplicant/wpa_supplicant.conf', renderer.result(binding))
+    # puts output = renderer.result(binding)
+    stdout, stderr, exit_status = Open3.capture3(@@wpa_cli, 'reconfigure')
+    return exit_status == 0
   end
 end
 
