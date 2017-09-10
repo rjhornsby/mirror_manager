@@ -2,8 +2,16 @@ $(document).ready(function() {
     $('#config-music-toggle').click(function() {
         configurationController.toggle_music();
     });
-    $('#config-restart').click(function() {
-        configurationController.restart();
+    $('#save-wifi-config').click(function() {
+        configurationController.save_wifi_config();
+    });
+    var fetch = $.getJSON('/config/wifi/network', {});
+
+    fetch.done(function(data) {
+       configurationController.populate_wifi_config(data)
+    });
+    fetch.fail(function(response){
+        api_fail('Retrieving wifi config', response)
     });
 });
 
@@ -28,24 +36,20 @@ var configurationController = {
                 api_fail('Toggling music', response);
             });
     },
-    restart: function() {
-        var music_toggle = $('#config-music-toggle');
-        var disable_list = [];
-        $.merge(disable_list, $('[id^="tab"]'));
-        $.merge(disable_list, $('[id^="config-wifi"]').children('input'));
-        $.merge(disable_list, music_toggle);
-        
-        disable_list.forEach(function(ele) {
-            if (ele.prop === undefined) {
-                ele.disabled = true
-            } else {
-                ele.prop('disabled', true);
-            }
-        });
+    populate_wifi_config: function(wifi_status) {
+        $('#config-wifi-ssid').val(wifi_status['ssid']);
+    },
+    save_wifi_config: function() {
+        var data = {
+            'ssid': $('#config-wifi-ssid').val(),
+            'password': $('#config-wifi-password').val()
+        };
+        $.post('/config/wifi/network', JSON.stringify(data), function(response) {}, 'json')
+            .done(function() {
+            })
+            .fail(function(response) {
+                api_fail('Saving', response);
+            });
 
-        $('#config-restart').children('i').addClass('fa-spin');
-        music_toggle.unbind();
-        $('body').addClass('restarting');
-        $('main').addClass('restarting');
     }
 };

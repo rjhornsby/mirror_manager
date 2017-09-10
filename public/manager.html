@@ -9,6 +9,7 @@
     <script src="js/configuration.js"></script>
     <link rel = "stylesheet" type = "text/css" href = "css/dropzone.css" />
     <link rel = "stylesheet" type = "text/css" href = "css/tabs.css" />
+    <link rel = "stylesheet" type = "text/css" href = "css/button.css" />
     <link rel = "stylesheet" type = "text/css" href = "css/manager.css" />
     <meta charset="UTF-8">
     <title>Mirror Manager</title>
@@ -48,23 +49,42 @@
                   id="tracksDropzone"></form>
         </section>
         <section id="content3">
-            <div id="configuration" class="table">
+            <div id="configuration-general" class="table">
+                <div class="row header blue">
+                    <div class="cell">General</div>
+                    <div></div>
+                </div>
                 <div class="row">
                     <div class="cell">Music</div>
                     <div class="cell" id="config-music-toggle"><i class="fa fa-volume-off fa-lg" aria-hidden="true"></i></div>
                 </div>
-                <div class="row">
-                    <div class="cell">WiFi Network</div>
-                    <div class="cell" id="config-wifi-network"><input name="wifi-network" class="config"/></div>
+            </div>
+
+            <div id="configuration-wifi" class="table">
+                <div class="row header blue">
+                    <div class="cell">Wifi</div>
+                    <div></div>
                 </div>
                 <div class="row">
-                    <div class="cell">WiFi Password</div>
-                    <div class="cell" id="config-wifi-password"><input name="wifi-password" type="password" class="config"/></div>
+                    <div class="cell">SSID</div>
+                    <div class="cell"><input id="config-wifi-ssid" name="wifi-network" class="config"/></div>
                 </div>
+                <div class="row">
+                    <div class="cell">Password</div>
+                    <div class="cell"><input id="config-wifi-password" name="wifi-password" type="password" class="config"/></div>
+                </div>
+                <div class="row">
+                    <div class="cell"></div>
+                    <div class="cell">
+                        <a href="#" class="fancy-button bg-gradient2" id="save-wifi-config"><span><i class="fa fa-wifi"></i>Save Wifi Settings</span></a>
+                    </div>
+                </div>
+                <!-- TODO: implement me later
                 <div class="row">
                     <div class="cell">Restart</div>
                     <div class="cell" id="config-restart"><i class="fa fa-refresh" aria-hidden="true"></i></div>
                 </div>
+                -->
             </div>
         </section>
     </div>

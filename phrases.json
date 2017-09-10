@@ -1,8 +1,28 @@
 {
-  "last_modified": "0",
+  "last_modified": "2017-08-28 21:46:43 -0500",
   "phrases": [
     {
+      "text": "be bold and courageous",
+      "duration": 2
+    },
+    {
+      "text": "His grace is sufficient for you",
+      "duration": 4
+    },
+    {
+      "text": "you are a child of the risen king",
+      "duration": 3
+    },
+    {
       "text": "you are beautiful",
+      "duration": 2
+    },
+    {
+      "text": "you are brave",
+      "duration": 2
+    },
+    {
+      "text": "you are enough",
       "duration": 2
     },
     {
@@ -14,27 +34,7 @@
       "duration": 2
     },
     {
-      "text": "His grace is sufficient for you",
-      "duration": 3
-    },
-    {
-      "text": "be bold and courageous",
-      "duration": 2
-    },
-    {
-      "text": "you are a child of the risen king",
-      "duration": 3
-    },
-    {
-      "text": "you are enough",
-      "duration": 2
-    },
-    {
       "text": "you are strong",
-      "duration": 2
-    },
-    {
-      "text": "you are brave",
       "duration": 2
     }
   ]

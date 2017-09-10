@@ -3,6 +3,8 @@ require 'json'
 require 'sinatra'
 require 'sinatra/cross_origin'
 require 'sinatra/json'
+require 'open3'
+require 'erb'
 require 'pp'
 
 MAX_PHRASE_LENGTH = 128
@@ -12,6 +14,8 @@ PHRASES_FILE = 'phrases.json'
 MUSIC_PATH = File.absolute_path('audio')
 
 class MirrorManager < Sinatra::Application
+
+  set :bind, '0.0.0.0'
 
   before do
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -56,8 +60,8 @@ class MirrorManager < Sinatra::Application
   end
 
   post '/tracks' do
-    track = Track.new(params['file']['filename'], params['file'])
-    # pp file
+    pp params
+    track = Track.new(params[:file][:filename], params[:file])
     error track.error, track.error_message unless track.upload_valid?
 
     File.open(track.absolute_path, 'wb') do |f|
@@ -75,6 +79,8 @@ class MirrorManager < Sinatra::Application
     'OK'.to_json
   end
 
+#  get('/config/music')
+
   put('/config/music/:state') {
     # TODO: set actual mirror config
     'OK'.to_json
@@ -82,9 +88,19 @@ class MirrorManager < Sinatra::Application
   # https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
   # wpa_cli reconfigure
   # https://github.com/radiodan-archive/wpa-cli-ruby/blob/master/lib/wpa_cli_ruby/wpa_cli_wrapper.rb
-  put('/config/wifi/network/:name') {}
-  put('/config/wifi/password/:password') {}
-  put('/config/restart') {}
+  get'/config/wifi/network' do
+    status = Wifi.status
+    status.to_json
+  end
+  post'/config/wifi/network' do
+    payload = params
+    payload = JSON.parse(request.body.read) unless params[:path]
+    if payload['ssid'].empty? || payload['password'].empty?
+      error 400, 'SSID and password required'
+    end
+    Wifi.new().reconfigure(payload['ssid'], payload['password'])
+    'OK'.to_json
+  end
 
 
   ### END ROUTES ###
@@ -130,6 +146,39 @@ class Mp3Info
   end
 end
 
+class Wifi
+  @@wpa_cli = '/sbin/wpa_cli'
+
+  attr_reader :ssid
+  attr_reader :psk
+
+  def self.status
+    status = Hash.new()
+    stdout, stderr, exit_status = Open3.capture3(@@wpa_cli, 'status')
+    stdout.each_line do |line|
+      line.chomp!
+      (key, value) = line.split('=', 2)
+      status[key] = value
+    end
+    return status
+  end
+
+  def reconfigure(ssid, psk)
+    @ssid = ssid
+    @psk = psk
+    template = File.read('templates/wpa_supplicant.conf.erb')
+    renderer = ERB.new(template, nil, '-')
+    puts renderer.result(binding)
+    # stdout, stderr, exit_status = Open3.capture3(@@wpa_cli, 'reconfigure')
+
+
+    # Wifi.wpa_cli('set_network', '0', 'ssid', "\"#{ssid}\"")
+    # Wifi.wpa_cli('set_network', '0', 'psk', "\"#{password}\"")
+    # Wifi.wpa_cli('enable_network', '0')
+    #
+  end
+end
+
 class Track
 
   @filename = nil
@@ -146,7 +195,7 @@ class Track
   end
 
   def upload_valid?
-    if @upload['type'] != 'audio/mpeg'
+    if @upload[:type] != 'audio/mpeg'
       _set_error(415, 'Invalid file type')
     elsif File.exist?(absolute_path)
       _set_error(409, 'File exists')
@@ -179,7 +228,7 @@ class Track
     if @upload.nil?
       nil
     else
-      @upload['tempfile']
+      @upload[:tempfile]
     end
   end
 

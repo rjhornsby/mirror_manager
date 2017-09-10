@@ -7,6 +7,8 @@ require 'multi_json'
 class MirrorManager < Sinatra::Application
   configure do
 
+    set :bind, '0.0.0.0'
+
     enable :cross_origin
 
     # Don't log them. We'll do that ourself
