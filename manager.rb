@@ -12,6 +12,7 @@ MAX_PHRASE_DURATION = 16
 MIN_PHRASE_DURATION = 2
 PHRASES_FILE = 'phrases.json'
 MUSIC_PATH = File.absolute_path('audio')
+MUTE_MUSIC_LOCK = File.join(MUSIC_PATH, 'mute_audio.lock')
 
 class MirrorManager < Sinatra::Application
 
@@ -78,12 +79,28 @@ class MirrorManager < Sinatra::Application
     'OK'.to_json
   end
 
-#  get('/config/music')
+  get '/config' do
+    config = {}
+    config[:muted] = File.exist?(MUTE_MUSIC_LOCK)
+    config[:wifi] = Wifi.status
+    config.to_json
+  end
 
-  put('/config/music/:state') {
-    # TODO: set actual mirror config
+  get'/config/music' do
+    # True: muted
+    # False: unmuted
+    File.exist?(MUTE_MUSIC_LOCK).to_json
+  end
+
+  put'/config/music/:state' do
+    if params['state'].downcase == 'on'
+      File.delete(MUTE_MUSIC_LOCK) if File.exist?(MUTE_MUSIC_LOCK)
+    else
+      FileUtils.touch(MUTE_MUSIC_LOCK)
+    end
     'OK'.to_json
-  }
+  end
+
   # https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
   # wpa_cli reconfigure
   # https://github.com/radiodan-archive/wpa-cli-ruby/blob/master/lib/wpa_cli_ruby/wpa_cli_wrapper.rb

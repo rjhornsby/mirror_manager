@@ -36,10 +36,10 @@ class ExceptionHandling
       env['rack.errors'].puts ex.backtrace.join("\n")
       env['rack.errors'].flush
 
-      hash = { message: ex.to_s }
+      # hash = { message: ex.to_s }
       # hash[:backtrace] = ex.backtrace
 
-      [500, { 'Content-Type' => 'application/json' }, [MultiJson.dump(hash)]]
+      [500, { 'Content-Type' => 'application/json' }, [MultiJson.dump(ex.to_s)]]
     end
   end
 end

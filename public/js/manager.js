@@ -17,15 +17,13 @@ Dropzone.options.tracksDropzone = {
 };
 
 function api_fail(action, response) {
-    var error_text = response.responseText;
-    if (response.responseJSON) {
-        error_text += '\n\n' + response.responseJSON.message;
-    }
+    var error_text = null;
+    // if (response.responseJSON) {
+    //    error_text = '\n\n' + response.responseJSON.responseText;
+    //} else {
+       error_text = '\n\n' + response.responseText;
+    // }
     alert('[' + response.status + '] Error ' + action + ': ' + error_text);
-    // $('#modal-title').text(action + ' Failed');
-    // $('#modal-text').text(error_text);
-    // $('#modal-trigger-small').attr('checked', true);
-
 }
 
 // PUT + DELETE methods

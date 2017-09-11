@@ -5,27 +5,26 @@ $(document).ready(function() {
     $('#save-wifi-config').click(function() {
         configurationController.save_wifi_config();
     });
-    var fetch = $.getJSON('/config/wifi/network', {});
+    var fetch = $.getJSON('/config', {});
 
-    fetch.done(function(data) {
-       configurationController.populate_wifi_config(data)
+    fetch.done(function(config) {
+       configurationController.populate_wifi_config(config['wifi']);
+       configurationController.set_music(config['music'] == 'on');
     });
     fetch.fail(function(response){
-        api_fail('Retrieving wifi config', response)
+        api_fail('retrieving configuration', response)
     });
 });
 
 var configurationController = {
-    toggle_music: function() {
+    toggle_music: function(state) {
         var element = $('#config-music-toggle').children('i');
         var new_state;
         if (element.hasClass('fa-volume-off')) {
-            element.removeClass('fa-volume-off');
-            element.addClass('fa-volume-up');
+            configurationController.set_music(true);
             new_state = 'on';
         } else {
-            element.removeClass('fa-volume-up');
-            element.addClass('fa-volume-off');
+            configurationController.set_music(false);
             new_state = 'off';
         }
         var api_uri = "http://" + $(location).attr('host') + "/config/music/" + new_state;
@@ -35,6 +34,16 @@ var configurationController = {
             .fail(function(response) {
                 api_fail('Toggling music', response);
             });
+    },
+    set_music: function(state) {
+        var element = $('#config-music-toggle').children('i');
+        if (state == true) {
+            element.removeClass('fa-volume-off');
+            element.addClass('fa-volume-up');
+        } else {
+            element.removeClass('fa-volume-up');
+            element.addClass('fa-volume-off');
+        }
     },
     populate_wifi_config: function(wifi_status) {
         $('#config-wifi-ssid').val(wifi_status['ssid']);

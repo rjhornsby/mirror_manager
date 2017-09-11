@@ -67,11 +67,9 @@ trackController.view = {
     upload_error: function(file, errorMessage) {
         if (file.xhr.status != 500) {
             var message = errorMessage.message || errorMessage;
-            api_fail('Uploading File', {status: file.xhr.status, statusText: message});
-            // alert('Upload failed. Error [' + file.xhr.status + ']: ' + message);
+            api_fail('Uploading File', {status: file.xhr.status, responseText: message});
         } else {
-            api_fail('Uploading File', {statusText: 'internal error'});
-            // alert('Upload failed: internal error');
+            api_fail('Uploading File', {responseText: 'internal error'});
         }
     },
     upload_success: function(file, response) {
