@@ -10,14 +10,6 @@
     }
 }
 
-body.restarting {
-    background: #ddd;
-}
-main.restarting {
-    background: #eee;
-    color: #aaa;
-}
-
 input.config {
     display: block;
 }
@@ -52,6 +44,10 @@ input.config {
 
 .cell.phrase-text {
     width: 500px;
+}
+
+#config-music-toggle {
+    width: 242px;
 }
 
 input.editable {
