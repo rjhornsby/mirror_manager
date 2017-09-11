@@ -52,6 +52,7 @@ class MirrorManager < Sinatra::Application
   get '/tracks' do
     track_list = []
     Dir.foreach(MUSIC_PATH) do |file|
+      next if File.basename(file) == File.basename(MUTE_MUSIC_LOCK)
       track = Track.new(file)
       if track.file?
         track_list << { file: track.basename, metadata: track.metadata }
