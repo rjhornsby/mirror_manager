@@ -1,0 +1,11 @@
+[Unit]
+Description=Mirror Manager
+
+[Service]
+WorkingDirectory=/home/pi/mirror_manager
+ExecStart=/usr/local/bin/rackup /home/pi/mirror_manager/config.ru
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+Alias=mirror_manager.service

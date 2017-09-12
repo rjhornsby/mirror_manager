@@ -7,8 +7,6 @@ require 'multi_json'
 class MirrorManager < Sinatra::Application
   configure do
 
-    set :bind, '0.0.0.0'
-
     enable :cross_origin
 
     # Don't log them. We'll do that ourself
@@ -45,7 +43,6 @@ class ExceptionHandling
 end
 
 use ExceptionHandling
-
 use Rack::Auth::Basic, 'Authentication required' do |username, password|
   username == 'admin' and password == 'mirror'
 end

@@ -10,13 +10,12 @@ require 'pp'
 MAX_PHRASE_LENGTH = 128
 MAX_PHRASE_DURATION = 16
 MIN_PHRASE_DURATION = 2
-PHRASES_FILE = 'phrases.json'
-MUSIC_PATH = File.absolute_path('audio')
+
+PHRASES_FILE    = File.absolute_path('cache/phrases.json')
+MUSIC_PATH      = File.absolute_path('cache/audio')
 MUTE_MUSIC_LOCK = File.join(MUSIC_PATH, 'mute_audio.lock')
 
 class MirrorManager < Sinatra::Application
-
-  set :bind, '0.0.0.0'
 
   before do
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -26,6 +25,11 @@ class MirrorManager < Sinatra::Application
   ### Static content route ###
   get '/' do
     send_file File.join(settings.public_folder, 'manager.html')
+  end
+
+  get '/version' do
+    version[:manager] = File.read('VERSION')
+    version.to_json
   end
 
   ### REST routes ###
