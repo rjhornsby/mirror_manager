@@ -91,14 +91,15 @@ class MirrorManager < Sinatra::Application
     config.to_json
   end
 
-  get'/config/music' do
+  get '/config/music' do
     # True: muted
     # False: unmuted
+    STDERR.puts "MUTE_MUSIC_LOCK? #{File.exist?(MUTE_MUSIC_LOCK)}"
     File.exist?(MUTE_MUSIC_LOCK).to_json
   end
 
-  put'/config/music/:state' do
-    if params['state'].downcase == 'on'
+  put '/config/music/:state' do
+    if params['state'].casecmp('on').zero?
       File.delete(MUTE_MUSIC_LOCK) if File.exist?(MUTE_MUSIC_LOCK)
     else
       FileUtils.touch(MUTE_MUSIC_LOCK)
@@ -221,16 +222,18 @@ class Track
   @error = nil
   @error_message = nil
 
+
   attr_reader :error
   attr_reader :error_message
 
   def initialize(filename, upload = nil)
     @filename = File.basename(filename.gsub(/[^\w.]/, '_'))
+    @valid_types = %w(audio/mpeg audio/mp3)
     @upload = upload
   end
 
   def upload_valid?
-    if @upload[:type] != 'audio/mpeg'
+    if !@valid_types.include?(@upload[:type])
       _set_error(415, 'Invalid file type')
     elsif File.exist?(absolute_path)
       _set_error(409, 'File exists')
