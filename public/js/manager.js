@@ -2,7 +2,7 @@ var cached_data = {phrases: [], tracks: []};
 
 Dropzone.options.tracksDropzone = {
     maxFilesize: 30,
-    acceptedFiles: 'audio/mpeg',
+    acceptedFiles: 'audio/mpeg,audio/mp3',
     addRemoveLinks: true,
     init: function() {
         // FIXME: DZ tooltip on 500 error is 'Object object'
