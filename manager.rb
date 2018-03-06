@@ -58,7 +58,7 @@ class MirrorManager < Sinatra::Application
     Dir.foreach(MUSIC_PATH) do |file|
       next if File.basename(file) == File.basename(MUTE_MUSIC_LOCK)
       track = Track.new(file)
-      if track.file?
+      if track.file? && !file.start_with?('.')
         track_list << { file: track.basename, metadata: track.metadata }
       end
     end
@@ -228,7 +228,7 @@ class Track
 
   def initialize(filename, upload = nil)
     @filename = File.basename(filename.gsub(/[^\w.]/, '_'))
-    @valid_types = %w(audio/mpeg audio/mp3)
+    @valid_types = %w[audio/mpeg audio/mp3]
     @upload = upload
   end
 
